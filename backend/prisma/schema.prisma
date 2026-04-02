@@ -1,0 +1,88 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Filme {
+  id            String   @id @default(uuid())
+  titulo        String
+  sinopse       String
+  genero        String
+  classificacao String
+  duracao       Int
+  dataEstreia   String
+  imagem        String?
+  sessoes       Sessao[]
+
+  @@map("filmes")
+}
+
+model Sala {
+  id         String   @id @default(uuid())
+  nome       String
+  capacidade Int
+  sessoes    Sessao[]
+
+  @@map("salas")
+}
+
+model Sessao {
+  id                String @id @default(uuid())
+  horario           String
+  valorIngresso     Float
+  ingressosVendidos Int?   @default(0)
+  tipoProjecao      String
+
+  filmeId String
+  filme   Filme  @relation(fields: [filmeId], references: [id])
+
+  salaId    String
+  sala      Sala       @relation(fields: [salaId], references: [id])
+  ingressos Ingresso[]
+
+  @@map("sessoes")
+}
+
+model Ingresso {
+  id           String @id @default(uuid())
+  valorInteira Float
+  valorMeia    Float
+
+  sessaoId String
+  sessao   Sessao @relation(fields: [sessaoId], references: [id])
+
+  pedidoId String
+  pedido   Pedido @relation(fields: [pedidoId], references: [id])
+
+  @@map("ingressos")
+}
+
+model Pedido {
+  id                String        @id @default(uuid())
+  quantidadeInteira Float
+  quantidadeMeia    Float
+  ingresso          Ingresso[]
+  lancheCombo       LancheCombo[]
+  valorTotal        Float
+  createdAt         DateTime      @default(now())
+
+  @@map("pedidos")
+}
+
+model LancheCombo {
+  id         String @id @default(uuid())
+  nome       String
+  descricao  String
+  preco      Float
+  quantidade Int    @default(0)
+
+  pedidoId String?
+  pedido   Pedido? @relation(fields: [pedidoId], references: [id])
+
+  @@map("lanche_combos")
+}
