@@ -110,7 +110,7 @@ export function ModalIngressosVendidos({
                   <tbody>
                     {pedidos.map((pedido) => {
                       const sessaoId = pedido.ingresso[0]?.sessaoId;
-                      const totalCombos = pedido.lancheCombo.reduce((sum, combo) => sum + (combo.quantidade ?? 1), 0);
+                      const totalCombos = pedido.lanchePedido.reduce((sum, combo) => sum + (combo.quantidade ?? 1), 0);
 
                       return (
                         <tr key={pedido.id}>

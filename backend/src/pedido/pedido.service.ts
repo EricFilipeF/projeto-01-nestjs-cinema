@@ -7,6 +7,24 @@ import { PrismaService } from '../prisma/prisma.service';
 export class PedidoService {
   constructor(private readonly prisma: PrismaService) { }
 
+  private mapearPedidoParaResposta(
+    pedido: any,
+  ) {
+    const { lanchePedido, ...pedidoBase } = pedido;
+
+    return {
+      ...pedidoBase,
+      lanchePedido: (lanchePedido ?? []).map((lanche: any) => ({
+        id: lanche.id,
+        nome: lanche.lancheCombo?.nome ?? '',
+        descricao: lanche.lancheCombo?.descricao ?? '',
+        preco: lanche.preco,
+        quantidade: lanche.quantidade,
+        lancheComboId: lanche.lancheComboId,
+      })),
+    };
+  }
+
   private async validarCapacidadeSessao(sessaoId: string, quantidadeNovosIngressos: number) {
     if (quantidadeNovosIngressos <= 0) {
       return;
@@ -52,11 +70,7 @@ export class PedidoService {
       createPedidoDto.quantidadeInteira * valorInteira +
       createPedidoDto.quantidadeMeia * valorMeia;
 
-    const totalCombos = (createPedidoDto.lancheCombo ?? []).reduce((total, combo) => {
-      return total + combo.preco * (combo.quantidade ?? 1);
-    }, 0);
-
-    return totalIngressos + totalCombos;
+    return totalIngressos;
   }
 
   async create(createPedidoDto: CreatePedidoDto) {
@@ -66,9 +80,41 @@ export class PedidoService {
       await this.validarCapacidadeSessao(sessaoId, createPedidoDto.ingresso.length);
     }
 
-    const valorTotal = this.calcularValorTotal(createPedidoDto);
+    const totalIngressos = this.calcularValorTotal(createPedidoDto);
 
-    return this.prisma.pedido.create({
+    const lanchesCompradosData = await Promise.all(
+      (createPedidoDto.lanchePedido ?? []).map(async (combo) => {
+        const comboCatalogo = await this.prisma.lancheCombo.findUnique({
+          where: { id: combo.lancheComboId },
+          select: { id: true, preco: true, nome: true },
+        });
+
+        if (!comboCatalogo) {
+          throw new NotFoundException(
+            `Combo com ID ${combo.lancheComboId} não encontrado no catálogo.`,
+          );
+        }
+
+        return {
+          quantidade: combo.quantidade,
+          preco: comboCatalogo.preco,
+          lancheCombo: {
+            connect: {
+              id: comboCatalogo.id,
+            },
+          },
+        };
+      }),
+    );
+
+    const totalLanches = lanchesCompradosData.reduce(
+      (acc, lanche) => acc + lanche.preco * lanche.quantidade,
+      0,
+    );
+
+    const valorTotal = totalIngressos + totalLanches;
+
+    const pedido = await this.prisma.pedido.create({
       data: {
         quantidadeInteira: createPedidoDto.quantidadeInteira,
         quantidadeMeia: createPedidoDto.quantidadeMeia,
@@ -78,29 +124,36 @@ export class PedidoService {
           create: createPedidoDto.ingresso,
         },
 
-        lancheCombo: {
-          create: (createPedidoDto.lancheCombo ?? []).map((combo) => ({
-            nome: combo.nome,
-            descricao: combo.descricao,
-            preco: combo.preco,
-            quantidade: combo.quantidade ?? 1,
-          })),
+        lanchePedido: {
+          create: lanchesCompradosData,
         },
       },
       include: {
         ingresso: true,
-        lancheCombo: true,
+        lanchePedido: {
+          include: {
+            lancheCombo: true,
+          },
+        },
       },
     });
+
+    return this.mapearPedidoParaResposta(pedido);
   }
 
   async findAll() {
-    return this.prisma.pedido.findMany({
+    const pedidos = await this.prisma.pedido.findMany({
       include: {
         ingresso: true,
-        lancheCombo: true,
+        lanchePedido: {
+          include: {
+            lancheCombo: true,
+          },
+        },
       },
     });
+
+    return pedidos.map((pedido) => this.mapearPedidoParaResposta(pedido));
   }
 
   async findOne(id: string) {
@@ -108,7 +161,11 @@ export class PedidoService {
       where: { id },
       include: {
         ingresso: true,
-        lancheCombo: true,
+        lanchePedido: {
+          include: {
+            lancheCombo: true,
+          },
+        },
       },
     });
 
@@ -116,13 +173,13 @@ export class PedidoService {
       throw new NotFoundException(`Pedido com ID ${id} não encontrado`);
     }
 
-    return pedido;
+    return this.mapearPedidoParaResposta(pedido);
   }
 
   async update(id: string, updatePedidoDto: UpdatePedidoDto) {
     await this.findOne(id);
 
-    const { ingresso, lancheCombo, ...pedidoData } = updatePedidoDto as any;
+    const { ingresso, lanchePedido, ...pedidoData } = updatePedidoDto as any;
 
     return this.prisma.pedido.update({
       where: { id },

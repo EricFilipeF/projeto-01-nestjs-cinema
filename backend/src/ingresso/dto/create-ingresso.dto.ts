@@ -5,15 +5,15 @@ export class CreateIngressoDto {
     @ApiProperty({ description: 'Valor do ingresso inteira', example: 30.0 })
     @IsNumber()
     @IsNotEmpty()
-    valorInteira: number;
+    valorInteira!: number;
 
     @ApiProperty({ description: 'Valor do ingresso meia', example: 15.0 })
     @IsNumber()
     @IsNotEmpty()
-    valorMeia: number;
+    valorMeia!: number;
 
     @ApiProperty({ description: 'ID da sessão associada ao ingresso', example: 'uuid-sessao' })
     @IsString()
     @IsNotEmpty()
-    sessaoId: string;
+    sessaoId!: string;
 }

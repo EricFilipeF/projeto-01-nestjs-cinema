@@ -32,11 +32,10 @@ model Sala {
 }
 
 model Sessao {
-  id                String @id @default(uuid())
-  horario           String
-  valorIngresso     Float
-  ingressosVendidos Int?   @default(0)
-  tipoProjecao      String
+  id            String @id @default(uuid())
+  horario       DateTime
+  valorIngresso Float
+  tipoProjecao  String
 
   filmeId String
   filme   Filme  @relation(fields: [filmeId], references: [id])
@@ -63,26 +62,38 @@ model Ingresso {
 }
 
 model Pedido {
-  id                String        @id @default(uuid())
+  id                String         @id @default(uuid())
   quantidadeInteira Float
   quantidadeMeia    Float
   ingresso          Ingresso[]
-  lancheCombo       LancheCombo[]
+  lanchePedido      LanchePedido[]
   valorTotal        Float
-  createdAt         DateTime      @default(now())
+  createdAt         DateTime       @default(now())
 
   @@map("pedidos")
 }
 
-model LancheCombo {
+model LanchePedido {
   id         String @id @default(uuid())
-  nome       String
-  descricao  String
+  quantidade Int
   preco      Float
-  quantidade Int    @default(0)
 
   pedidoId String?
   pedido   Pedido? @relation(fields: [pedidoId], references: [id])
+
+  lancheCombo   LancheCombo? @relation(fields: [lancheComboId], references: [id])
+  lancheComboId String?
+
+  @@map("lanches_comprados")
+}
+
+model LancheCombo {
+  id        String @id @default(uuid())
+  nome      String
+  descricao String
+  preco     Float
+
+  lanchePedido LanchePedido[]
 
   @@map("lanche_combos")
 }

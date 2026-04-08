@@ -7,14 +7,13 @@ import { PrismaService } from '../prisma/prisma.service';
 export class SessaoService {
   constructor(private readonly prisma: PrismaService) { }
 
-  private calcularFimSessao(horario: string, duracaoFilme: number): Date {
-    const inicio = new Date(horario);
-    return new Date(inicio.getTime() + duracaoFilme * 60 * 1000);
+  private calcularFimSessao(horario: Date, duracaoFilme: number): Date {
+    return new Date(horario.getTime() + duracaoFilme * 60 * 1000);
   }
 
   private async validarConflitoSala(
     salaId: string,
-    horario: string,
+    horario: Date,
     filmeId: string,
     sessaoIdExcluir?: string,
   ) {
@@ -27,7 +26,6 @@ export class SessaoService {
       throw new NotFoundException(`Filme com ID ${filmeId} não encontrado`);
     }
 
-    const inicioNovaSessao = new Date(horario);
     const fimNovaSessao = this.calcularFimSessao(horario, filme.duracao);
 
     const sessoesDaSala = await this.prisma.sessao.findMany({
@@ -48,9 +46,9 @@ export class SessaoService {
 
     const sessaoConflitante = sessoesDaSala.find((sessao) => {
       const inicioExistente = new Date(sessao.horario);
-      const fimExistente = this.calcularFimSessao(sessao.horario, sessao.filme.duracao);
+      const fimExistente = this.calcularFimSessao(new Date(sessao.horario), sessao.filme.duracao);
 
-      return inicioNovaSessao < fimExistente && fimNovaSessao > inicioExistente;
+      return horario < fimExistente && fimNovaSessao > inicioExistente;
     });
 
     if (sessaoConflitante) {

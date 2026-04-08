@@ -7,32 +7,32 @@ import { PrismaService } from '../prisma/prisma.service';
 export class ComboService {
   constructor(private readonly prisma: PrismaService) { }
 
-  private async validarComboSemIngressosVinculados(id: string) {
-    const lancheCombo = await this.prisma.lancheCombo.findUnique({
-      where: { id },
-      select: {
-        id: true,
-        pedido: {
-          select: {
-            id: true,
-            ingresso: {
-              select: {
-                id: true,
-              },
-            },
-          },
-        },
-      },
-    });
+  // private async validarComboSemIngressosVinculados(id: string) {
+  //   const lancheCombo = await this.prisma.lancheCombo.findUnique({
+  //     where: { id },
+  //     select: {
+  //       id: true,
+  //       pedido: {
+  //         select: {
+  //           id: true,
+  //           ingresso: {
+  //             select: {
+  //               id: true,
+  //             },
+  //           },
+  //         },
+  //       },
+  //     },
+  //   });
 
-    if (!lancheCombo) {
-      throw new NotFoundException(`Combo com ID ${id} não encontrado`);
-    }
+  //   if (!lancheCombo) {
+  //     throw new NotFoundException(`Combo com ID ${id} não encontrado`);
+  //   }
 
-    if (lancheCombo.pedido && lancheCombo.pedido.ingresso.length > 0) {
-      throw new ConflictException('Não é possível excluir este combo pois ele está vinculado a um pedido com ingresso(s).');
-    }
-  }
+  //   if (lancheCombo.pedido && lancheCombo.pedido.ingresso.length > 0) {
+  //     throw new ConflictException('Não é possível excluir este combo pois ele está vinculado a um pedido com ingresso(s).');
+  //   }
+  // }
 
   async create(createComboDto: CreateComboDto) {
     return this.prisma.lancheCombo.create({
@@ -41,11 +41,7 @@ export class ComboService {
   }
 
   async findAll() {
-    return this.prisma.lancheCombo.findMany({
-      where: {
-        pedidoId: null,
-      },
-    });
+    return this.prisma.lancheCombo.findMany();
   }
 
   async findOne(id: string) {
@@ -70,7 +66,7 @@ export class ComboService {
   }
 
   async remove(id: string) {
-    await this.validarComboSemIngressosVinculados(id);
+    await this.findOne(id); // Garante que o combo existe antes de tentar remover
 
     return this.prisma.lancheCombo.delete({
       where: { id },

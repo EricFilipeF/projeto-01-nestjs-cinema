@@ -111,17 +111,18 @@ export function ModalVendaIngresso({
 
   const adicionarLanche = (lanche: LancheCombo) => {
     setCombos((prev) => {
-      const comboExistente = prev.find((combo) => combo.nome === lanche.nome);
+      const comboExistente = prev.find((combo) => combo.lancheComboId === lanche.id);
 
       if (comboExistente) {
         return prev.map((combo) =>
-          combo.nome === lanche.nome
+          combo.lancheComboId === lanche.id
             ? { ...combo, quantidade: combo.quantidade + 1 }
             : combo
         );
       }
 
       const novoCombo: ComboPedido = {
+        lancheComboId: String(lanche.id),
         nome: lanche.nome,
         descricao: lanche.descricao,
         quantidade: 1,
@@ -168,10 +169,8 @@ export function ModalVendaIngresso({
         });
       }
 
-      const lancheCombo: CreatePedidoInput['lancheCombo'] = combos.map((combo) => ({
-        nome: combo.nome,
-        descricao: combo.descricao,
-        preco: combo.valorUnitario,
+      const lanchePedido: CreatePedidoInput['lanchePedido'] = combos.map((combo) => ({
+        lancheComboId: combo.lancheComboId,
         quantidade: combo.quantidade,
       }));
       
@@ -179,7 +178,7 @@ export function ModalVendaIngresso({
         quantidadeInteira: qInteira,
         quantidadeMeia: qMeia,
         ingresso,
-        lancheCombo,
+        lanchePedido,
       };
       
       await pedidosService.create(pedido);

@@ -1,4 +1,5 @@
 export interface ComboPedido {
+  lancheComboId: string;
   nome: string;
   descricao: string;
   quantidade: number;
@@ -17,7 +18,7 @@ export interface Pedido {
     valorMeia: number;
     sessaoId: string;
   }[];
-  lancheCombo: {
+  lanchePedido: {
     id: string;
     nome: string;
     descricao: string;
@@ -34,10 +35,8 @@ export interface CreatePedidoInput {
     valorMeia: number;
     sessaoId: string;
   }[];
-  lancheCombo: {
-    nome: string;
-    descricao: string;
-    preco: number;
+  lanchePedido: {
+    lancheComboId: string;
     quantidade: number;
   }[];
 }
