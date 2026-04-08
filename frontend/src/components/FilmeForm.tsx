@@ -108,11 +108,11 @@ export function FilmeForm({
                 disabled={loading}
               >
                 <option value="">Selecione o gênero</option>
-                <option value="acao">Ação</option>
-                <option value="comedia">Comédia</option>
-                <option value="drama">Drama</option>
-                <option value="ficcao">Ficção Científica</option>
-                <option value="terror">Terror</option>
+                <option value="Ação">Ação</option>
+                <option value="Comédia">Comédia</option>
+                <option value="Drama">Drama</option>
+                <option value="Ficção científica">Ficção Científica</option>
+                <option value="Terror">Terror</option>
               </select>
               {errors.genero && <div className="invalid-feedback">{errors.genero}</div>}
             </div>

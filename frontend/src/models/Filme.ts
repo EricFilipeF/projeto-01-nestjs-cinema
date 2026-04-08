@@ -4,7 +4,7 @@ export interface Filme {
   id: string;
   titulo: string;
   sinopse: string;
-  genero: 'acao' | 'comedia' | 'drama' | 'ficcao' | 'terror';
+  genero: 'Ação' | 'Comédia' | 'Drama' | 'Ficção científica' | 'Terror';
   classificacao: 'livre' | '10' | '12' | '14' | '16' | '18';
   duracao: number;
   dataEstreia: string;
@@ -20,7 +20,7 @@ export const filmeSchema = z.object({
     .string({ message: 'Sinopse é obrigatória' })
     .min(10, 'Sinopse deve ter no mínimo 10 caracteres')
     .max(500, 'Sinopse deve ter no máximo 500 caracteres'),
-  genero: z.enum(['acao', 'comedia', 'drama', 'ficcao', 'terror'], {
+  genero: z.enum(['Ação', 'Comédia', 'Drama', 'Ficção científica', 'Terror'], {
     message: 'Selecione um gênero válido',
   }),
   classificacao: z.enum(['livre', '10', '12', '14', '16', '18'], {

@@ -20,7 +20,7 @@ export const sessoesService = {
   },
 
   async update(id: number | string, sessao: SessaoInput): Promise<Sessao> {
-    const response = await axios.put<Sessao>(`${API_URL}/${id}`, sessao);
+    const response = await axios.patch<Sessao>(`${API_URL}/${id}`, sessao);
     return response.data;
   },
 

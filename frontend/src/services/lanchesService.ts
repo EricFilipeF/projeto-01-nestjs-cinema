@@ -20,7 +20,7 @@ export const lanchesService = {
   },
 
   async update(id: number | string, lanche: LancheComboInput): Promise<LancheCombo> {
-    const response = await axios.put<LancheCombo>(`${API_URL}/${id}`, lanche);
+    const response = await axios.patch<LancheCombo>(`${API_URL}/${id}`, lanche);
     return response.data;
   },
 

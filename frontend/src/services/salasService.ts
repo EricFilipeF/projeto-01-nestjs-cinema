@@ -24,7 +24,7 @@ export const salasService = {
 
   // Atualizar sala existente
   update: async (id: string, sala: SalaInput): Promise<Sala> => {
-    const response = await axios.put<Sala>(`${API_URL}/${id}`, sala);
+    const response = await axios.patch<Sala>(`${API_URL}/${id}`, sala);
     return response.data;
   },
 

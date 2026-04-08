@@ -20,7 +20,7 @@ export const filmesService = {
   },
 
   async update(id: string, filme: FilmeInput): Promise<Filme> {
-    const response = await axios.put<Filme>(`${API_URL}/${id}`, filme);
+    const response = await axios.patch<Filme>(`${API_URL}/${id}`, filme);
     return response.data;
   },
 
