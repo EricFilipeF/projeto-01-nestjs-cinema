@@ -32,6 +32,11 @@ export class CreatePedidoDto {
                 valorMeia: 15,
                 sessaoId: 'uuid',
             },
+            {
+                valorInteira: 30,
+                valorMeia: 15,
+                sessaoId: 'uuid',
+            },
         ],
     })
     @IsArray()
