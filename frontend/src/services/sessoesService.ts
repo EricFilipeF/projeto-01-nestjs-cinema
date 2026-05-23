@@ -1,30 +1,30 @@
-import axios from 'axios';
 import type { Sessao, SessaoInput } from '../models/Sessao';
+import { api } from './api';
 
-const API_URL = 'http://localhost:3000/sessao';
+const API_URL = '/sessao';
 
 export const sessoesService = {
   async getAll(): Promise<Sessao[]> {
-    const response = await axios.get<Sessao[]>(API_URL);
+    const response = await api.get<Sessao[]>(API_URL);
     return response.data;
   },
 
   async getById(id: number | string): Promise<Sessao> {
-    const response = await axios.get<Sessao>(`${API_URL}/${id}`);
+    const response = await api.get<Sessao>(`${API_URL}/${id}`);
     return response.data;
   },
 
   async create(sessao: SessaoInput): Promise<Sessao> {
-    const response = await axios.post<Sessao>(API_URL, sessao);
+    const response = await api.post<Sessao>(API_URL, sessao);
     return response.data;
   },
 
   async update(id: number | string, sessao: SessaoInput): Promise<Sessao> {
-    const response = await axios.patch<Sessao>(`${API_URL}/${id}`, sessao);
+    const response = await api.patch<Sessao>(`${API_URL}/${id}`, sessao);
     return response.data;
   },
 
   async delete(id: number | string): Promise<void> {
-    await axios.delete(`${API_URL}/${id}`);
+    await api.delete(`${API_URL}/${id}`);
   },
 };

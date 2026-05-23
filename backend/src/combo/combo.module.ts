@@ -3,9 +3,10 @@ import { ComboService } from './combo.service';
 import { ComboController } from './combo.controller';
 import { Prisma } from 'src/generated/prisma/client';
 import { PrismaModule } from 'src/prisma/prisma.module';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, AuthModule],
   controllers: [ComboController],
   providers: [ComboService],
 })

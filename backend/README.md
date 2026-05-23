@@ -31,6 +31,16 @@
 $ npm install
 ```
 
+## Gmail SMTP
+
+Use Gmail as the SMTP provider for password recovery emails.
+
+1. Enable 2-step verification on the Gmail account and create an app password.
+2. Copy `.env.example` to `.env`.
+3. Set `SMTP_HOST=smtp.gmail.com`, `SMTP_PORT=587`, `SMTP_USER` and `SMTP_PASS`.
+4. Set `MAIL_FROM` to the same Gmail account or a verified alias.
+5. Restart the backend after editing `.env` so the new values are loaded.
+
 ## Compile and run the project
 
 ```bash
