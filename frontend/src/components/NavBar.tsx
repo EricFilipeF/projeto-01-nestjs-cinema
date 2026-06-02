@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 
 export function NavBar() {
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -46,9 +46,6 @@ export function NavBar() {
               <Link to="/sessoes" className="nav-link">Sessões</Link>
             </li>
             <li className="nav-item d-flex align-items-center ms-lg-3 mt-3 mt-lg-0">
-              <span className="text-white-50 small me-3 d-none d-lg-inline">
-                {user?.email}
-              </span>
               <button type="button" className="btn btn-outline-light btn-sm" onClick={handleLogout}>
                 Sair
               </button>

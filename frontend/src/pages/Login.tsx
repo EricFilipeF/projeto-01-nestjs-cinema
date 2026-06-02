@@ -67,7 +67,7 @@ export function Login() {
                 <form onSubmit={handleSubmit} className="d-grid gap-3">
                   <div>
                     <label htmlFor="email" className="form-label fw-semibold text-secondary">
-                      Email
+                      E-mail
                     </label>
                     <input
                       id="email"
@@ -76,7 +76,7 @@ export function Login() {
                       value={email}
                       onChange={(event) => setEmail(event.target.value)}
                       autoComplete="email"
-                      placeholder="seuemail@exemplo.com"
+                      placeholder="Seu e-mail"
                       required
                     />
                   </div>

@@ -118,7 +118,6 @@ export function Home() {
           <div className="row align-items-center">
             <div className="col-md-8">
               <h1 className="display-4 fw-bold">Bem-vindo ao CineWeb</h1>
-              <p className="lead">Confira a programação e garanta já o seu ingresso!</p>
             </div>
             <div className="col-md-4 text-center">
               <div className="bg-white rounded p-3 d-inline-block">

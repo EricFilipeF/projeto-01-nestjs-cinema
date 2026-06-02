@@ -129,7 +129,7 @@ export function RecoverPassword() {
                 <form onSubmit={handleRequestToken} className="d-grid gap-3 mb-4">
                   <div>
                     <label htmlFor="email" className="form-label fw-semibold text-secondary">
-                      Email da conta
+                      E-mail
                     </label>
                     <input
                       id="email"
@@ -137,7 +137,7 @@ export function RecoverPassword() {
                       className="form-control form-control-lg login-input"
                       value={email}
                       onChange={(event) => setEmail(event.target.value)}
-                      placeholder="seuemail@exemplo.com"
+                      placeholder="Seu e-mail"
                       required
                     />
                   </div>
