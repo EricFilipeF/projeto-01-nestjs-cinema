@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "user_roles" AS ENUM ('admin', 'operator');
+CREATE TYPE "user_roles" AS ENUM ('admin', 'cliente');
 
 -- CreateTable
 CREATE TABLE "users" (
@@ -7,7 +7,7 @@ CREATE TABLE "users" (
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password_hash" TEXT NOT NULL,
-    "role" "user_roles" NOT NULL DEFAULT 'operator',
+    "role" "user_roles" NOT NULL DEFAULT 'cliente',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 

@@ -61,6 +61,55 @@ export class MailService {
     await transport.sendMail(message);
   }
 
+  async sendRegistrationConfirmationCode(recipientEmail: string, code: string) {
+    const codeTtlMinutes = process.env.REGISTRATION_CONFIRMATION_CODE_TTL_MINUTES || '15';
+
+    if (!this.smtpUser || !this.smtpPass) {
+      throw new InternalServerErrorException(
+        'Configure SMTP_USER e SMTP_PASS com a conta e a senha de app do Gmail.',
+      );
+    }
+
+    const message = {
+      from: this.mailFrom,
+      to: recipientEmail,
+      subject: 'Confirmação de cadastro CineWeb',
+      text: [
+        'Recebemos uma solicitação para criar sua conta no CineWeb.',
+        '',
+        `Seu código de confirmação é: ${code}`,
+        '',
+        `Esse código expira em ${codeTtlMinutes} minutos.`,
+        '',
+        'Se você não solicitou esse cadastro, ignore este email.',
+      ].join('\n'),
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #1f2937;">
+          <h2 style="color: #0d6efd; margin-bottom: 16px;">Confirmação de cadastro CineWeb</h2>
+          <p>Recebemos uma solicitação para criar sua conta.</p>
+          <p><strong>Seu código de confirmação:</strong></p>
+          <div style="padding: 16px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; font-size: 18px; letter-spacing: 4px; font-family: monospace; text-align: center;">
+            ${code}
+          </div>
+          <p style="margin-top: 16px;">Esse código expira em ${codeTtlMinutes} minutos.</p>
+          <p>Se você não solicitou esse cadastro, ignore este email.</p>
+        </div>
+      `,
+    };
+
+    const transport = nodemailer.createTransport({
+      host: this.smtpHost,
+      port: this.smtpPort,
+      secure: this.smtpPort === 465,
+      auth: {
+        user: this.smtpUser,
+        pass: this.smtpPass,
+      },
+    });
+
+    await transport.sendMail(message);
+  }
+
   private normalizeAppPassword(value?: string) {
     return value?.replace(/\s+/g, '').trim();
   }

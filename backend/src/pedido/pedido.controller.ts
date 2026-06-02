@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
 import { PedidoService } from './pedido.service';
 import { CreatePedidoDto } from './dto/create-pedido.dto';
 import { UpdatePedidoDto } from './dto/update-pedido.dto';
@@ -10,18 +10,23 @@ export class PedidoController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() createPedidoDto: CreatePedidoDto) {
-    return this.pedidoService.create(createPedidoDto);
+  create(@Body() createPedidoDto: CreatePedidoDto, @Req() req: any) {
+    const userId = req.user.sub;
+    return this.pedidoService.create(createPedidoDto, userId);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
-  findAll() {
-    return this.pedidoService.findAll();
+  findAll(@Req() req: any) {
+    const userId = req.user.role === 'admin' ? undefined : req.user.sub;
+    return this.pedidoService.findAll(userId);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.pedidoService.findOne(id);
+  findOne(@Param('id') id: string, @Req() req: any) {
+    const userId = req.user.role === 'admin' ? undefined : req.user.sub;
+    return this.pedidoService.findOne(id, userId);
   }
 
   @UseGuards(JwtAuthGuard)

@@ -83,6 +83,11 @@ export class SessaoService {
       include: {
         filme: true,
         sala: true,
+        ingressos: {
+          select: {
+            assento: true,
+          },
+        },
       },
     });
   }
@@ -93,6 +98,11 @@ export class SessaoService {
       include: {
         filme: true,
         sala: true,
+        ingressos: {
+          select: {
+            assento: true,
+          },
+        },
       },
     });
 

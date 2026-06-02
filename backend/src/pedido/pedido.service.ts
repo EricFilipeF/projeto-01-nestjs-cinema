@@ -2,6 +2,7 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { CreatePedidoDto } from './dto/create-pedido.dto';
 import { UpdatePedidoDto } from './dto/update-pedido.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { CreateIngressoDto } from '../ingresso/dto/create-ingresso.dto';
 
 @Injectable()
 export class PedidoService {
@@ -73,11 +74,49 @@ export class PedidoService {
     return totalIngressos;
   }
 
-  async create(createPedidoDto: CreatePedidoDto) {
+  private async validarAssentosDisponiveis(sessaoId: string, ingressosDto: CreateIngressoDto[]) {
+    // Obter todos os assentos solicitados que não são vazios
+    const assentosSolicitados = ingressosDto
+      .map(i => i.assento?.trim())
+      .filter(Boolean) as string[];
+
+    if (assentosSolicitados.length === 0) {
+      return;
+    }
+
+    // Verificar duplicatas no próprio payload
+    const duplicates = assentosSolicitados.filter((item, index) => assentosSolicitados.indexOf(item) !== index);
+    if (duplicates.length > 0) {
+      throw new ConflictException(`Assento duplicado no pedido: ${duplicates.join(', ')}`);
+    }
+
+    // Buscar no banco se algum desses assentos já está vendido para esta sessão
+    const ingressosJaVendidos = await this.prisma.ingresso.findMany({
+      where: {
+        sessaoId,
+        assento: {
+          in: assentosSolicitados,
+        },
+      },
+      select: {
+        assento: true,
+      },
+    });
+
+    if (ingressosJaVendidos.length > 0) {
+      const assentosConflitantes = ingressosJaVendidos.map(i => i.assento).join(', ');
+      throw new ConflictException(
+        `Os seguintes assentos já foram vendidos para esta sessão: ${assentosConflitantes}. Por favor, selecione outros assentos.`
+      );
+    }
+  }
+
+  async create(createPedidoDto: CreatePedidoDto, userId?: string) {
     const sessaoId = createPedidoDto.ingresso[0]?.sessaoId;
 
     if (sessaoId) {
       await this.validarCapacidadeSessao(sessaoId, createPedidoDto.ingresso.length);
+      await this.validarAssentosDisponiveis(sessaoId, createPedidoDto.ingresso);
     }
 
     const totalIngressos = this.calcularValorTotal(createPedidoDto);
@@ -119,6 +158,7 @@ export class PedidoService {
         quantidadeInteira: createPedidoDto.quantidadeInteira,
         quantidadeMeia: createPedidoDto.quantidadeMeia,
         valorTotal,
+        userId: userId || null,
 
         ingresso: {
           create: createPedidoDto.ingresso,
@@ -129,7 +169,16 @@ export class PedidoService {
         },
       },
       include: {
-        ingresso: true,
+        ingresso: {
+          include: {
+            sessao: {
+              include: {
+                filme: true,
+                sala: true,
+              },
+            },
+          },
+        },
         lanchePedido: {
           include: {
             lancheCombo: true,
@@ -141,10 +190,20 @@ export class PedidoService {
     return this.mapearPedidoParaResposta(pedido);
   }
 
-  async findAll() {
+  async findAll(userId?: string) {
     const pedidos = await this.prisma.pedido.findMany({
+      where: userId ? { userId } : {},
       include: {
-        ingresso: true,
+        ingresso: {
+          include: {
+            sessao: {
+              include: {
+                filme: true,
+                sala: true,
+              },
+            },
+          },
+        },
         lanchePedido: {
           include: {
             lancheCombo: true,
@@ -156,11 +215,20 @@ export class PedidoService {
     return pedidos.map((pedido) => this.mapearPedidoParaResposta(pedido));
   }
 
-  async findOne(id: string) {
-    const pedido = await this.prisma.pedido.findUnique({
-      where: { id },
+  async findOne(id: string, userId?: string) {
+    const pedido = await this.prisma.pedido.findFirst({
+      where: userId ? { id, userId } : { id },
       include: {
-        ingresso: true,
+        ingresso: {
+          include: {
+            sessao: {
+              include: {
+                filme: true,
+                sala: true,
+              },
+            },
+          },
+        },
         lanchePedido: {
           include: {
             lancheCombo: true,

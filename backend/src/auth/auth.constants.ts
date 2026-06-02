@@ -4,3 +4,4 @@ export const DEFAULT_ADMIN_NAME = 'Administrador';
 export const DEFAULT_JWT_SECRET = 'cineweb-jwt-secret';
 export const DEFAULT_JWT_EXPIRES_IN_SECONDS = 60 * 60 * 8;
 export const DEFAULT_PASSWORD_RESET_TOKEN_TTL_MINUTES = 15;
+export const DEFAULT_REGISTRATION_CONFIRMATION_CODE_TTL_MINUTES = 15;
