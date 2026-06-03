@@ -3,7 +3,10 @@ import { PedidoService } from './pedido.service';
 import { CreatePedidoDto } from './dto/create-pedido.dto';
 import { UpdatePedidoDto } from './dto/update-pedido.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Pedidos')
+@ApiBearerAuth()
 @Controller('pedido')
 export class PedidoController {
   constructor(private readonly pedidoService: PedidoService) { }

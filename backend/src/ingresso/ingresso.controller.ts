@@ -3,7 +3,9 @@ import { IngressoService } from './ingresso.service';
 import { CreateIngressoDto } from './dto/create-ingresso.dto';
 import { UpdateIngressoDto } from './dto/update-ingresso.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Ingressos')
 @Controller('ingresso')
 export class IngressoController {
   constructor(private readonly ingressoService: IngressoService) { }
@@ -24,12 +26,14 @@ export class IngressoController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateIngressoDto: UpdateIngressoDto) {
     return this.ingressoService.update(id, updateIngressoDto);
   }
 
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.ingressoService.remove(id);

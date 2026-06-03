@@ -3,12 +3,15 @@ import { SalaService } from './sala.service';
 import { CreateSalaDto } from './dto/create-sala.dto';
 import { UpdateSalaDto } from './dto/update-sala.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Salas')
 @Controller('sala')
 export class SalaController {
   constructor(private readonly salaService: SalaService) {}
 
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Post()
   create(@Body() createSalaDto: CreateSalaDto) {
     return this.salaService.create(createSalaDto);
@@ -25,12 +28,14 @@ export class SalaController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateSalaDto: UpdateSalaDto) {
     return this.salaService.update(id, updateSalaDto);
   }
 
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.salaService.remove(id);
